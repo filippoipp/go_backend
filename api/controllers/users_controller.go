@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
 	"github.com/filippoipp/go_backend/api/models"
 	"github.com/filippoipp/go_backend/api/responses"
 	"github.com/filippoipp/go_backend/api/utils"
+	"github.com/gorilla/mux"
 )
 
 func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
