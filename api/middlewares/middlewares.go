@@ -2,8 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-
-	"github.com/filippoipp/go_backend/api/responses"
 )
 
 func SetMiddlewareJSON(next http.HandlerFunc) http.HandlerFunc {
