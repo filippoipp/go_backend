@@ -16,12 +16,13 @@ type User struct {
 	Email     		string    	`gorm:"size:100;not null;unique" json:"email"`
 	CreatedAt 		time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt 		time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
-	Collection  	[]Book		`gorm:"foreignKey:OwnerID"`
+	Collection      []Book		`gorm:"foreignkey:LoggedUserID" json:"collection"`
 }
 
 func (u *User) Prepare() {
 	u.Name = html.EscapeString(strings.TrimSpace(u.Name))
 	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
+	u.Collection = []Book{}
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
 }
@@ -50,7 +51,7 @@ func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 
 func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
 	var err error
-	err = db.Debug().Model(User{}).Where("id = ?", uid).Take(&u).Error
+	err = db.Debug().Model(User{}).Preload("Collection").Where("id = ?", uid).Take(&u).Error
 	if err != nil {
 		return &User{}, err
 	}

@@ -11,10 +11,9 @@ import (
 
 type Book struct {
 	ID      			uint64    	`gorm:"primary_key;auto_increment" json:"id"`
-	Title     			string    	`gorm:"size:255;not" json:"title"`
+	Title     			string    	`gorm:"size:255;not null" json:"title"`
 	Pages   			string    	`gorm:"not null;" json:"pages"`
-	Owner  				User		`json:"owner"`
-	OwnerID 			uint		`sql:"type:int REFERENCES users(id)" json:"owner_id"`
+	LoggedUserID 		uint64		`gorm:"not null" json:"logged_user_id"`
 	CreatedAt 			time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt 			time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
@@ -23,7 +22,6 @@ func (b *Book) Prepare() {
 	b.ID = 0
 	b.Title = html.EscapeString(strings.TrimSpace(b.Title))
 	b.Pages = html.EscapeString(strings.TrimSpace(b.Pages))
-	b.Owner = User{}
 	b.CreatedAt = time.Now()
 	b.UpdatedAt = time.Now()
 }
@@ -43,7 +41,7 @@ func (b *Book) SaveBook(db *gorm.DB) (*Book, error) {
 		return &Book{}, err
 	}
 	if b.ID != 0 {
-		err = db.Debug().Model(&User{}).Where("id = ?", b.OwnerID).Take(&b.Pages).Error
+		err = db.Debug().Model(&User{}).Where("id = ?").Error
 		if err != nil {
 			return &Book{}, err
 		}
