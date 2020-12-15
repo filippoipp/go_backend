@@ -12,14 +12,13 @@ import (
 
 type User struct {
 	ID        	uint32    	`gorm:"primary_key;auto_increment" json:"id"`
-	Name  		string    	`gorm:"size:255;not null;unique" json:"name"`
+	Name  		string    	`gorm:"size:255;not null" json:"name"`
 	Email     	string    	`gorm:"size:100;not null;unique" json:"email"`
 	CreatedAt 	time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt 	time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
 func (u *User) Prepare() {
-	u.ID = 0
 	u.Name = html.EscapeString(strings.TrimSpace(u.Name))
 	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
 	u.CreatedAt = time.Now()
@@ -63,9 +62,9 @@ func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
 func (u *User) UpdateAUser(db *gorm.DB, uid uint32) (*User, error) {
 	db = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&User{}).UpdateColumns(
 		map[string]interface{}{
-			"name":  u.Name,
-			"email":     u.Email,
-			"update_at": time.Now(),
+			"name":  		u.Name,
+			"email":     	u.Email,
+			"update_at": 	time.Now(),
 		},
 	)
 	if db.Error != nil {
