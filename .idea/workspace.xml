@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="aef4c952-48ca-4535-8295-a7b7ba9e3f37" name="Default Changelist" comment="" />
+    <list default="true" id="aef4c952-48ca-4535-8295-a7b7ba9e3f37" name="Default Changelist" comment="fix: finding and error">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/controllers/base.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/controllers/home_controller.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/controllers/routes.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/controllers/users_controller.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/middlewares/middlewares.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/models/User.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/responses/json.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/server.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/utils/formaterror.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -38,6 +54,22 @@
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$" />
   </component>
+  <component name="RunManager">
+    <configuration name="go build backend-go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="backend-go" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <filePath value="$PROJECT_DIR$/main.go" />
+      <package value="backend-go" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build backend-go" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
@@ -53,5 +85,9 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix: finding and error" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: finding and error" />
   </component>
 </project>

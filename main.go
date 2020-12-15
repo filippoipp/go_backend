@@ -1,6 +1,8 @@
 package main
 
-import "github.com/filippoipp/go_backend/api"
+import (
+	"backend-go/api"
+)
 
 func main() {
 	api.Run()

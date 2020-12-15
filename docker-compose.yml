@@ -4,19 +4,18 @@ services:
     container_name: full_app
     build: .
     ports:
-      - 8080:8080
+      - 8080:8080 # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: on-failure
     volumes:
       - api:/usr/src/app/
     depends_on:
-      - fullstack-postgres
+      - postgres # This service depends on postgres. Start that first.
     networks:
       - fullstack
 
-
-  fullstack-postgres:
+  postgres:
     image: postgres:latest
-    container_name: full_db_postgres
+    container_name: full_db
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -35,4 +34,3 @@ volumes:
 
 networks:
   fullstack:
-    driver: bridge
