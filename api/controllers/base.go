@@ -30,7 +30,8 @@ func (server *Server) Initialize(DbUser, DbPassword, DbPort, DbHost, DbName stri
 		fmt.Printf("We are connected to the database")
 	}
 
-	server.DB.Debug().AutoMigrate(&models.User{}) //database migration
+	server.DB.DropTableIfExists(&models.User{}, &models.Book{})
+	server.DB.Debug().AutoMigrate(&models.User{}, &models.Book{}) //database migration
 
 	server.Router = mux.NewRouter()
 

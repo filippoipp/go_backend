@@ -9,94 +9,44 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type Post struct {
-	ID      	uint64    	`gorm:"primary_key;auto_increment" json:"id"`
-	Title     	string    	`gorm:"size:255;not" json:"title"`
-	Pages   	uint64    	`gorm:"not null;" json:"pages"`
-	AuthorID  	uint32    	`sql:"type:int REFERENCES users(id)" json:"author_id"`
-	CreatedAt 	time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt 	time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
+type Book struct {
+	ID      			uint64    	`gorm:"primary_key;auto_increment" json:"id"`
+	Title     			string    	`gorm:"size:255;not" json:"title"`
+	Pages   			string    	`gorm:"not null;" json:"pages"`
+	Owner  				User		`json:"owner"`
+	OwnerID 			uint		`sql:"type:int REFERENCES users(id)" json:"owner_id"`
+	CreatedAt 			time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt 			time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
-func (p *Post) Prepare() {
-	p.ID = 0
-	p.Title = html.EscapeString(strings.TrimSpace(p.Title))
-	p.Pages = 0
-	p.CreatedAt = time.Now()
-	p.UpdatedAt = time.Now()
+func (b *Book) Prepare() {
+	b.ID = 0
+	b.Title = html.EscapeString(strings.TrimSpace(b.Title))
+	b.Pages = html.EscapeString(strings.TrimSpace(b.Pages))
+	b.Owner = User{}
+	b.CreatedAt = time.Now()
+	b.UpdatedAt = time.Now()
 }
 
-func (p *Post) Validate() error {
+func (b *Book) Validate() error {
 
-	if p.Title == "" {
+	if b.Title == "" {
 		return errors.New("Required Title")
-	}
-	if p.Content == "" {
-		return errors.New("Required Content")
-	}
-	if p.AuthorID < 1 {
-		return errors.New("Required Author")
 	}
 	return nil
 }
 
-func (p *Post) SavePost(db *gorm.DB) (*Post, error) {
+func (b *Book) SaveBook(db *gorm.DB) (*Book, error) {
 	var err error
-	err = db.Debug().Model(&Post{}).Create(&p).Error
+	err = db.Debug().Model(&Book{}).Create(&b).Error
 	if err != nil {
-		return &Post{}, err
+		return &Book{}, err
 	}
-	if p.ID != 0 {
-		err = db.Debug().Model(&User{}).Where("id = ?", p.AuthorID).Take(&p.Author).Error
+	if b.ID != 0 {
+		err = db.Debug().Model(&User{}).Where("id = ?", b.OwnerID).Take(&b.Pages).Error
 		if err != nil {
-			return &Post{}, err
+			return &Book{}, err
 		}
 	}
-	return p, nil
-}
-
-func (p *Post) FindAllPosts(db *gorm.DB) (*[]Post, error) {
-	var err error
-	posts := []Post{}
-	err = db.Debug().Model(&Post{}).Limit(100).Find(&posts).Error
-	if err != nil {
-		return &[]Post{}, err
-	}
-	if len(posts) > 0 {
-		for i, _ := range posts {
-			err := db.Debug().Model(&User{}).Where("id = ?", posts[i].AuthorID).Take(&posts[i].Author).Error
-			if err != nil {
-				return &[]Post{}, err
-			}
-		}
-	}
-	return &posts, nil
-}
-
-func (p *Post) FindPostByID(db *gorm.DB, pid uint64) (*Post, error) {
-	var err error
-	err = db.Debug().Model(&Post{}).Where("id = ?", pid).Take(&p).Error
-	if err != nil {
-		return &Post{}, err
-	}
-	if p.ID != 0 {
-		err = db.Debug().Model(&User{}).Where("id = ?", p.AuthorID).Take(&p.Author).Error
-		if err != nil {
-			return &Post{}, err
-		}
-	}
-	return p, nil
-}
-
-func (p *Post) DeleteAPost(db *gorm.DB, pid uint64, uid uint32) (int64, error) {
-
-	db = db.Debug().Model(&Post{}).Where("id = ? and author_id = ?", pid, uid).Take(&Post{}).Delete(&Post{})
-
-	if db.Error != nil {
-		if gorm.IsRecordNotFoundError(db.Error) {
-			return 0, errors.New("Post not found")
-		}
-		return 0, db.Error
-	}
-	return db.RowsAffected, nil
+	return b, nil
 }
