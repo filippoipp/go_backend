@@ -14,6 +14,7 @@ type Book struct {
 	Title     			string    	`gorm:"size:255;not null" json:"title"`
 	Pages   			string    	`gorm:"not null;" json:"pages"`
 	LoggedUserID 		uint64		`gorm:"not null" json:"logged_user_id"`
+	ToUserID			uint64		`gorm:"not null" json:"to_user_id"`
 	CreatedAt 			time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt 			time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
@@ -46,5 +47,14 @@ func (b *Book) SaveBook(db *gorm.DB) (*Book, error) {
 			return &Book{}, err
 		}
 	}
+	return b, nil
+}
+
+func (b *Book) UpdateABook(db *gorm.DB) (*Book, error) {
+	err := db.Debug().Model(&Book{}).Where("id = ?", b.ID).Updates(Book{ToUserID: b.ToUserID, UpdatedAt: time.Now()}).Error
+	if err != nil {
+		return &Book{}, err
+	}
+
 	return b, nil
 }

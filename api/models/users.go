@@ -17,14 +17,18 @@ type User struct {
 	CreatedAt 		time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt 		time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 	Collection      []Book		`gorm:"foreignkey:LoggedUserID" json:"collection"`
+	LentBooks      	[]Book		`gorm:"foreignkey:LoggedUserID" json:"lent_books"`
+	BorrowedBooks   []Book		`gorm:"foreignkey:LoggedUserID" json:"borrowed_books"`
 }
 
 func (u *User) Prepare() {
-	u.Name = html.EscapeString(strings.TrimSpace(u.Name))
-	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
-	u.Collection = []Book{}
-	u.CreatedAt = time.Now()
-	u.UpdatedAt = time.Now()
+	u.Name = 			html.EscapeString(strings.TrimSpace(u.Name))
+	u.Email = 			html.EscapeString(strings.TrimSpace(u.Email))
+	u.Collection = 		[]Book{}
+	u.LentBooks = 		[]Book{}
+	u.BorrowedBooks = 	[]Book{}
+	u.CreatedAt = 		time.Now()
+	u.UpdatedAt = 		time.Now()
 }
 
 func (u *User) Validate(action string) error {
