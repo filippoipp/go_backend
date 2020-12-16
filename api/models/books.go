@@ -50,8 +50,8 @@ func (b *Book) SaveBook(db *gorm.DB) (*Book, error) {
 	return b, nil
 }
 
-func (b *Book) UpdateABook(db *gorm.DB) (*Book, error) {
-	err := db.Debug().Model(&Book{}).Where("id = ?", b.ID).Updates(Book{ToUserID: b.ToUserID, UpdatedAt: time.Now()}).Error
+func (b *Book) UpdateABook(db *gorm.DB, touser uint64, bookid uint64) (*Book, error) {
+	err := db.Debug().Model(&Book{}).Where("id = ?", bookid).Update("to_user_id", touser).Error
 	if err != nil {
 		return &Book{}, err
 	}

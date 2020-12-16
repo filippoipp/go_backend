@@ -14,4 +14,5 @@ func (s *Server) initializeRoutes() {
 
 	s.Router.HandleFunc("/book", middlewares.SetMiddlewareJSON(s.CreateBook)).Methods("POST")
 	s.Router.HandleFunc("/book/lend", middlewares.SetMiddlewareJSON(s.LendBook)).Methods("PUT")
+	s.Router.HandleFunc("/book/return", middlewares.SetMiddlewareJSON(s.ReturnBook)).Methods("PUT")
 }

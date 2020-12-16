@@ -50,8 +50,8 @@ func (server *Server) LendBook(w http.ResponseWriter, r *http.Request) {
 
 	t := struct {
 		LoggedUserID *uint64 `json:"logged_user_id"`
-		BookID *int `json:"book_id"`
-		ToUserID *int `json:"to_user_id"`// pointer so we can test for field absence
+		BookID *uint64 `json:"book_id"`
+		ToUserID *uint64 `json:"to_user_id"`
 	}{}
 
 	err := d.Decode(&t)
@@ -60,9 +60,6 @@ func (server *Server) LendBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	fmt.Println(*t.LoggedUserID)
-
 
 	// Check if the book exist
 	book := models.Book{}
@@ -78,31 +75,72 @@ func (server *Server) LendBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Read the data
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+	// Book owner can't land book for himself
+	if *t.ToUserID == book.LoggedUserID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
 
-	// Start processing the request data
-	bookUpdate := models.Book{}
-	err = json.Unmarshal(body, &t)
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+	//Check if book's already lended
+	if book.ToUserID != 0 {
+		responses.ERROR(w, http.StatusBadRequest, errors.New("The book's already lended"))
 		return
 	}
 
-	bookUpdate.Prepare()
-	err = bookUpdate.Validate()
+
+	bookUpdated, err := book.UpdateABook(server.DB, *t.ToUserID, *t.BookID)
+
+	fmt.Println(bookUpdated)
+
 	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		formattedError := formaterror.FormatError(err.Error())
+		responses.ERROR(w, http.StatusInternalServerError, formattedError)
+		return
+	}
+	responses.JSON(w, http.StatusOK, bookUpdated)
+}
+
+func (server *Server) ReturnBook(w http.ResponseWriter, r *http.Request) {
+
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+
+	t := struct {
+		LoggedUserID *uint64 `json:"logged_user_id"`
+		BookID *uint64 `json:"book_id"`
+	}{}
+
+	err := d.Decode(&t)
+	if err != nil {
+		// bad JSON or unrecognized json field
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	bookUpdate.ID = book.ID //this is important to tell the model the book id to update, the other update field are set above
+	// Check if the book exist
+	book := models.Book{}
+	err = server.DB.Debug().Model(models.Book{}).Where("id = ?", *t.BookID).Take(&book).Error
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, errors.New("Book not found"))
+		return
+	}
 
-	bookUpdated, err := bookUpdate.UpdateABook(server.DB)
+	// If a user attempt to lend a book not belonging to him
+	if *t.LoggedUserID != book.LoggedUserID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		return
+	}
+
+	//Check if book's already lended
+	if book.ToUserID != 0 {
+		responses.ERROR(w, http.StatusBadRequest, errors.New("The book's already lended"))
+		return
+	}
+
+
+	bookUpdated, err := book.UpdateABook(server.DB, *t.ToUserID, *t.BookID)
+
+	fmt.Println(bookUpdated)
 
 	if err != nil {
 		formattedError := formaterror.FormatError(err.Error())
