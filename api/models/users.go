@@ -17,7 +17,7 @@ type User struct {
 	CreatedAt 		time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt 		time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 	Collection      []Book		`gorm:"foreignkey:LoggedUserID" json:"collection"`
-	LentBooks      	[]Book		`gorm:"foreignkey:" json:"lent_books"`
+	LentBooks      	[]Book		`gorm:"foreignkey:LoggedUserID" json:"lent_books"`
 	BorrowedBooks   []Book		`gorm:"foreignkey:ToUserID" json:"borrowed_books"`
 }
 
@@ -55,7 +55,7 @@ func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 
 func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
 	var err error
-	err = db.Debug().Model(User{}).Preload("Collection").Preload("BorrowedBooks").Where("id = ?", uid).Take(&u).Error
+	err = db.Debug().Model(User{}).Preload("Collection").Preload("BorrowedBooks").Preload("LentBooks", "to_user_id != 0").Where("id = ?", uid).Take(&u).Error
 	if err != nil {
 		return &User{}, err
 	}
