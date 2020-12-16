@@ -7,10 +7,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 )
 
 func (server *Server) CreateBook(w http.ResponseWriter, r *http.Request) {
@@ -45,30 +43,7 @@ func (server *Server) CreateBook(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, bookCreated)
 }
 
-func (server *Server) UpdatePost(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r)
-
-	// Check if the book id is valid
-	pid, err := strconv.ParseUint(vars["id"], 10, 64)
-	if err != nil {
-		responses.ERROR(w, http.StatusBadRequest, err)
-		return
-	}
-
-	// Check if the book exist
-	book := models.Book{}
-	err = server.DB.Debug().Model(models.Book{}).Where("id = ?", pid).Take(&book).Error
-	if err != nil {
-		responses.ERROR(w, http.StatusNotFound, errors.New("Post not found"))
-		return
-	}
-
-	// If a user attempt to lend a book not belonging to him
-	if uid != book.LoggedUserID {
-		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
-		return
-	}
+func (server *Server) LendBook(w http.ResponseWriter, r *http.Request) {
 
 	// Read the data
 	body, err := ioutil.ReadAll(r.Body)
@@ -82,6 +57,22 @@ func (server *Server) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &bookUpdate)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	fmt.Print(bookUpdate)
+
+	// Check if the book exist
+	book := models.Book{}
+	err = server.DB.Debug().Model(models.Book{}).Where("id = ?", body[1]).Take(&book).Error
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, errors.New("Post not found"))
+		return
+	}
+
+	// If a user attempt to lend a book not belonging to him
+	if 2 != book.LoggedUserID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
 
