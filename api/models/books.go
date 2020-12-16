@@ -58,3 +58,12 @@ func (b *Book) UpdateABook(db *gorm.DB, touser uint64, bookid uint64) (*Book, er
 
 	return b, nil
 }
+
+func (b *Book) ReturnABook(db *gorm.DB, bookid uint64) (*Book, error) {
+	err := db.Debug().Model(&Book{}).Where("id = ?", bookid).Update("to_user_id", 0).Error
+	if err != nil {
+		return &Book{}, err
+	}
+
+	return b, nil
+}

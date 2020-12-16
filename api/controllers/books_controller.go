@@ -61,6 +61,22 @@ func (server *Server) LendBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if the user exist
+	user := models.User{}
+	err = server.DB.Debug().Model(models.User{}).Where("id = ?", *t.LoggedUserID).Take(&user).Error
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, errors.New("User not found"))
+		return
+	}
+
+	// Check if the to user exist
+	user = models.User{}
+	err = server.DB.Debug().Model(models.User{}).Where("id = ?", *t.ToUserID).Take(&user).Error
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, errors.New("To User not found"))
+		return
+	}
+
 	// Check if the book exist
 	book := models.Book{}
 	err = server.DB.Debug().Model(models.Book{}).Where("id = ?", *t.BookID).Take(&book).Error
@@ -132,13 +148,12 @@ func (server *Server) ReturnBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Check if book's already lended
-	if book.ToUserID != 0 {
-		responses.ERROR(w, http.StatusBadRequest, errors.New("The book's already lended"))
+	if book.ToUserID == 0 {
+		responses.ERROR(w, http.StatusBadRequest, errors.New("The book's isn't lended"))
 		return
 	}
 
-
-	bookUpdated, err := book.UpdateABook(server.DB, *t.ToUserID, *t.BookID)
+	bookUpdated, err := book.ReturnABook(server.DB, *t.BookID)
 
 	fmt.Println(bookUpdated)
 
