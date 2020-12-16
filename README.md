@@ -1,7 +1,25 @@
-How to Install
-Clone o projeto
-git clone
-Instale as dependências
-npm install
-Execute o banco no Docker
-docker run --name db_postgres  -p 5432:5432 -e POSTGRES_DB=thanos -e POSTGRES_PASSWORD=root -e POSTGRES_USER=root -d postgres:10.11
+PROJETO DESENVOLVIDO NA IDE GOLAND
+
+HOW TO INSTALL:
+
+1 - Clonar o projeto
+
+2 - Rodar o comando docker-compose up -d para criar o banco postgres no docker
+
+3 - Rodar o comando go run main.go para executar o projeto.
+
+* As migrações são rodadas automaticamente ao se executar o projeto.
+** Todas as vezes que o projeto é executado ele apaga e cria novamente as tabelas.
+
+FUNCIONAMENTO
+
+1 - Criação de usuário
+2 - Criação de livro
+3 - Emprestar livro
+4 - Devolver livro
+5 - Buscar usuário por ID
+
+TESTES
+
+Para a realização dos testes é necessario a alteração das variáveis no .env
+e posteriormente caminhar até a pasta tests/modeltests e executar o comando go test
